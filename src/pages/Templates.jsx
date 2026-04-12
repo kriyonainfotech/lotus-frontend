@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, LayoutTemplate, Search, Filter, Edit2, Trash2, Smartphone, Image as ImageIcon, Maximize } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 const Templates = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Templates = () => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await axios.get('http://localhost:3333/api/templates');
+      const response = await api.get('/templates');
       setTemplates(response.data);
     } catch (error) {
       console.error('Error fetching templates:', error);
@@ -31,9 +31,7 @@ const Templates = () => {
   const deleteTemplate = async (id) => {
     if (window.confirm('Are you sure you want to delete this template?')) {
       try {
-        await axios.delete(`http://localhost:3333/api/templates/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.delete(`/templates/${id}`);
         setTemplates(templates.filter(t => t._id !== id));
       } catch (error) {
         console.error('Error deleting template:', error);

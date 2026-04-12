@@ -24,7 +24,7 @@ import {
   MousePointer2
 } from 'lucide-react';
 import { Canvas, IText, FabricImage } from 'fabric';
-import axios from 'axios';
+import api from '../services/api';
 
 const TemplateEditor = () => {
   const [searchParams] = useSearchParams();
@@ -230,11 +230,8 @@ const TemplateEditor = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:3333/api/templates/upload', formData, {
-        headers: { 
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+      const res = await api.post('/templates/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       // Fabric v7: fromURL returns a Promise
@@ -367,15 +364,12 @@ const TemplateEditor = () => {
 
     try {
       setLoading(true);
-      const config = {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      };
 
       if (id) {
-        await axios.put(`http://localhost:3333/api/templates/${id}`, data, config);
+        await api.put(`/templates/${id}`, data);
         alert('Design Saved! ✨');
       } else {
-        await axios.post('http://localhost:3333/api/templates', data, config);
+        await api.post('/templates', data);
         navigate('/templates');
       }
       setIsDirty(false);
