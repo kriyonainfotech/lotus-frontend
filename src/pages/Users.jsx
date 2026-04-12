@@ -97,12 +97,12 @@ const Users = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Manage Users</h1>
-          <p className="text-slate-500 mt-1">View, add, edit, and delete platform users.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Manage Users</h1>
+          <p className="text-slate-500 mt-1 text-sm sm:text-base">View, add, edit, and delete platform users.</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-slate-200"
+          className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-slate-200 active:scale-95 text-sm sm:text-base"
         >
           <Plus size={20} />
           <span>Add User</span>
@@ -196,10 +196,10 @@ const Users = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-none sm:zoom-in-95 duration-300">
+            <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-xl font-bold text-slate-900">
                 {currentUser ? 'Edit User' : 'Add New User'}
               </h3>
@@ -211,7 +211,7 @@ const Users = () => {
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 px-1">Full Name</label>
                 <div className="relative">
@@ -220,7 +220,7 @@ const Users = () => {
                     type="text" 
                     required
                     placeholder="Enter name"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
@@ -235,46 +235,44 @@ const Users = () => {
                     type="email" 
                     required
                     placeholder="Enter email"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm font-semibold text-slate-700 px-1">Phone (10 digits)</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input 
-                      type="text" 
-                      required
-                      pattern="[0-9]{10}"
-                      title="Please enter exactly 10 digits"
-                      placeholder="Enter 10 digit number"
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
-                      value={formData.phoneNumber}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, '').slice(0, 10);
-                        setFormData({...formData, phoneNumber: val});
-                      }}
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-700 px-1">Phone (10 digits)</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input 
+                    type="text" 
+                    required
+                    pattern="[0-9]{10}"
+                    title="Please enter exactly 10 digits"
+                    placeholder="Enter 10 digit number"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm"
+                    value={formData.phoneNumber}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setFormData({...formData, phoneNumber: val});
+                    }}
+                  />
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3">
+              <div className="pt-4 flex flex-col sm:flex-row gap-3">
                 <button 
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3 px-4 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition-colors"
+                  className="w-full sm:flex-1 py-3.5 px-4 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="flex-2 py-3 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-all shadow-lg shadow-slate-200"
+                  className="w-full sm:flex-2 py-3.5 px-8 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all shadow-lg shadow-slate-200 order-1 sm:order-2 active:scale-[0.98]"
                 >
                   {currentUser ? 'Update User' : 'Save User'}
                 </button>

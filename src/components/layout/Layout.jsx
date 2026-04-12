@@ -31,7 +31,7 @@ const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -46,6 +46,14 @@ const Layout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
+      {/* Sidebar Overlay (Mobile only) */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 transition-transform duration-300 transform ${
@@ -54,7 +62,7 @@ const Layout = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6">
+          <div className="p-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white">
                 <History size={24} />
@@ -63,6 +71,12 @@ const Layout = ({ children }) => {
                 Lotus Admin
               </span>
             </div>
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-2 text-slate-400 hover:bg-slate-50 rounded-lg lg:hidden"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {/* Navigation */}
@@ -72,6 +86,7 @@ const Layout = ({ children }) => {
                 key={item.to}
                 {...item}
                 active={location.pathname === item.to}
+                onClick={() => setIsSidebarOpen(false)}
               />
             ))}
           </nav>
@@ -105,18 +120,18 @@ const Layout = ({ children }) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:hidden">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:hidden shrink-0">
           <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            onClick={() => setIsSidebarOpen(true)}
             className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
           >
-            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            <Menu size={24} />
           </button>
           <span className="text-lg font-bold text-slate-900">Lotus Admin</span>
           <div className="w-10" /> {/* Spacer */}
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-10">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10">{children}</main>
       </div>
     </div>
   );
