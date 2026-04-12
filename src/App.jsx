@@ -10,6 +10,8 @@ import Layout from "./components/layout/Layout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
+import Templates from "./pages/Templates";
+import TemplateEditor from "./pages/TemplateEditor";
 
 // Simple Settings mockup
 const Settings = () => (
@@ -67,6 +69,30 @@ function App() {
               element={
                 <Layout>
                   <Dashboard />
+                </Layout>
+              }
+            />
+            <Route
+              path="/templates"
+              element={
+                <Layout>
+                  <Templates />
+                </Layout>
+              }
+            />
+            <Route
+              path="/templates/create"
+              element={
+                <Layout>
+                  <TemplateEditor />
+                </Layout>
+              }
+            />
+            <Route
+              path="/templates/edit/:id"
+              element={
+                <Layout>
+                  <TemplateEditor />
                 </Layout>
               }
             />

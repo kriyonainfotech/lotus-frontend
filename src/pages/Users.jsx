@@ -19,7 +19,9 @@ import {
   Shield,
   CheckCircle2,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -32,6 +34,14 @@ const Users = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [viewUser, setViewUser] = useState(null);
   const [industries, setIndustries] = useState([]);
+  
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    limit: 10
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -47,8 +57,7 @@ const Users = () => {
     businessName: '',
     industryId: '',
     logoUrl: '',
-    contactPhone: '',
-
+    contactPhone: ''
   });
 
   const [logoFile, setLogoFile] = useState(null);
@@ -58,7 +67,7 @@ const Users = () => {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(1);
     fetchIndustries();
   }, []);
 
@@ -73,22 +82,43 @@ const Users = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1, search = searchTerm) => {
     try {
       setLoading(true);
-      const res = await api.get('/admin/users');
+      const res = await api.get('/admin/users', {
+        params: {
+          page,
+          limit: pagination.limit,
+          search
+        }
+      });
 
-      console.log(res.data, 'users');
-      setUsers(Array.isArray(res.data) ? res.data : []);
+      if (res.data) {
+        setUsers(res.data.users || []);
+        setPagination(prev => ({
+          ...prev,
+          currentPage: res.data.currentPage,
+          totalPages: res.data.totalPages,
+          totalUsers: res.data.totalUsers
+        }));
+      }
     } catch (error) {
       console.error('Error fetching users:', error.response?.data || error.message);
-      // Fallback dummy data for demo if backend fails or returns 401
-      setUsers([
-        { _id: '1', name: 'John Doe', email: 'john@example.com', phoneNumber: '1234567890' },
-        { _id: '2', name: 'Jane Smith', email: 'jane@example.com', phoneNumber: '9876543210' },
-      ]);
+      setUsers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    fetchUsers(1, value);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchUsers(newPage);
     }
   };
 
@@ -172,7 +202,6 @@ const Users = () => {
       let finalLogoUrl = formData.logoUrl;
       let finalAvatarUrl = formData.avatarUrl;
 
-      // Upload logo if changed
       if (logoFile) {
         const logoData = new FormData();
         logoData.append('image', logoFile);
@@ -184,7 +213,6 @@ const Users = () => {
         }
       }
 
-      // Upload avatar if changed
       if (avatarFile) {
         const avatarData = new FormData();
         avatarData.append('image', avatarFile);
@@ -208,7 +236,7 @@ const Users = () => {
         await api.post('/admin/users', submissionData);
       }
       setIsModalOpen(false);
-      fetchUsers();
+      fetchUsers(pagination.currentPage);
     } catch (error) {
       console.error('Error saving user:', error);
       alert('Error saving user. Please check console.');
@@ -221,17 +249,12 @@ const Users = () => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         await api.delete(`/admin/users/${id}`);
-        fetchUsers();
+        fetchUsers(pagination.currentPage);
       } catch (error) {
         console.error('Error deleting user:', error);
       }
     }
   };
-
-  const filteredUsers = users.filter(user =>
-    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -251,7 +274,7 @@ const Users = () => {
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         {/* Search and Filters */}
-        <div className="p-4 border-b border-slate-100 flex items-center">
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input
@@ -259,8 +282,11 @@ const Users = () => {
               placeholder="Search users by name or email..."
               className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearch}
             />
+          </div>
+          <div className="text-xs font-medium text-slate-400">
+            Total {pagination.totalUsers} Records
           </div>
         </div>
 
@@ -285,19 +311,23 @@ const Users = () => {
                     </div>
                   </td>
                 </tr>
-              ) : filteredUsers.length === 0 ? (
+              ) : users.length === 0 ? (
                 <tr>
                   <td colSpan="4" className="px-6 py-10 text-center text-slate-500">
                     No users found matching your search.
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user) => (
+                users.map((user) => (
                   <tr key={user._id} className="hover:bg-slate-50 transition-colors duration-150">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center">
-                          {user.name?.charAt(0) || 'U'}
+                        <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center overflow-hidden">
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            user.name?.charAt(0) || 'U'
+                          )}
                         </div>
                         <div>
                           <p className="font-semibold text-slate-900">{user.name}</p>
@@ -357,6 +387,62 @@ const Users = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {!loading && pagination.totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <p className="text-sm text-slate-500">
+              Showing <span className="font-semibold text-slate-900">{(pagination.currentPage - 1) * pagination.limit + 1}</span> to <span className="font-semibold text-slate-900">{Math.min(pagination.currentPage * pagination.limit, pagination.totalUsers)}</span> of <span className="font-semibold text-slate-900">{pagination.totalUsers}</span> users
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                disabled={pagination.currentPage === 1}
+                className="p-2 border border-slate-200 rounded-lg hover:bg-white text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              
+              {[...Array(pagination.totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                // Show first, last, current, and pages around current
+                if (
+                  pageNum === 1 || 
+                  pageNum === pagination.totalPages || 
+                  (pageNum >= pagination.currentPage - 1 && pageNum <= pagination.currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`min-w-[40px] h-10 px-3 rounded-lg text-sm font-semibold transition-all ${
+                        pagination.currentPage === pageNum
+                          ? 'bg-slate-900 text-white shadow-md'
+                          : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (
+                  pageNum === pagination.currentPage - 2 || 
+                  pageNum === pagination.currentPage + 2
+                ) {
+                  return <span key={pageNum} className="text-slate-400">...</span>;
+                }
+                return null;
+              })}
+
+              <button
+                onClick={() => handlePageChange(pagination.currentPage + 1)}
+                disabled={pagination.currentPage === pagination.totalPages}
+                className="p-2 border border-slate-200 rounded-lg hover:bg-white text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -378,7 +464,6 @@ const Users = () => {
 
             <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Firebase UID - only editable if new user or for debugging */}
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700 px-1">Firebase UID</label>
                   <input
@@ -536,7 +621,6 @@ const Users = () => {
                   </div>
                 </div>
 
-                {/* Business Information Section */}
                 <div className="col-span-1 md:col-span-2 pt-4">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="h-px flex-1 bg-slate-100"></div>
@@ -679,7 +763,6 @@ const Users = () => {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-8">
-              {/* Personal Info */}
               <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -735,7 +818,6 @@ const Users = () => {
                 </div>
               </section>
 
-              {/* Business Info */}
               {viewUser.business && (
                 <section className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
                   <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -775,7 +857,6 @@ const Users = () => {
                 </section>
               )}
 
-              {/* Media Gallery Section */}
               <section className="space-y-4">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                   <Globe size={14} /> Media & Assets

@@ -9,6 +9,7 @@ import {
   Menu,
   X,
   UserCircle,
+  LayoutTemplate
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -40,6 +41,7 @@ const Layout = ({ children }) => {
 
   const navItems = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/templates", icon: LayoutTemplate, label: "Templates" },
     { to: "/users", icon: Users, label: "Manage Users" },
     // { to: '/settings', icon: Settings, label: 'Settings' },
   ];
