@@ -92,10 +92,6 @@ const Login = () => {
             </div>
 
             <div className="group space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-bold text-slate-700 transition-colors group-focus-within:text-primary-600">Password</label>
-                <a href="#" className="text-xs font-bold text-primary-600 hover:text-primary-700">Forgot?</a>
-              </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-500" size={20} />
                 <input
@@ -124,22 +120,6 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          <div className="mt-10">
-            <div className="relative mb-8">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-4 text-slate-400 font-bold tracking-widest">Or continue with</span></div>
-            </div>
-
-            {/* <button className="w-full py-3 border border-slate-200 rounded-2xl flex items-center justify-center gap-3 hover:bg-slate-50 transition-colors duration-300">
-              <Github size={20} className="text-slate-900" />
-              <span className="font-bold text-slate-700">Github</span>
-            </button> */}
-          </div>
-
-          <p className="mt-8 text-center text-sm text-slate-500 font-medium">
-            Don't have an eye? <a href="#" className="text-primary-600 font-bold hover:underline">Request access</a>
-          </p>
         </div>
       </div>
     </div>
