@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  History, 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  History,
+  LayoutDashboard,
+  Users,
+  Settings,
+  LogOut,
+  Menu,
   X,
-  UserCircle
-} from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+  UserCircle,
+} from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const SidebarLink = ({ to, icon: Icon, label, active, onClick }) => (
   <Link
     to={to}
     onClick={onClick}
     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-      active 
-        ? 'bg-slate-900 text-white shadow-lg shadow-slate-200' 
-        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+      active
+        ? "bg-slate-900 text-white shadow-lg shadow-slate-200"
+        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
     }`}
   >
     <Icon size={20} />
@@ -35,21 +35,21 @@ const Layout = ({ children }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/users', icon: Users, label: 'Manage Users' },
-    { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/users", icon: Users, label: "Manage Users" },
+    // { to: '/settings', icon: Settings, label: 'Settings' },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
-      <aside 
+      <aside
         className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 transition-transform duration-300 transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:relative lg:translate-x-0`}
       >
         <div className="flex flex-col h-full">
@@ -83,8 +83,12 @@ const Layout = ({ children }) => {
                 <UserCircle size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-900 truncate">{user?.name || 'Admin User'}</p>
-                <p className="text-xs text-slate-500 truncate">{user?.email || 'admin@example.com'}</p>
+                <p className="text-sm font-semibold text-slate-900 truncate">
+                  {user?.name || "Admin User"}
+                </p>
+                <p className="text-xs text-slate-500 truncate">
+                  {user?.email || "admin@example.com"}
+                </p>
               </div>
             </div>
             <button
@@ -102,7 +106,7 @@ const Layout = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:hidden">
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
           >
@@ -112,9 +116,7 @@ const Layout = ({ children }) => {
           <div className="w-10" /> {/* Spacer */}
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-10">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6 lg:p-10">{children}</main>
       </div>
     </div>
   );

@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   UserCheck, 
   UserMinus, 
   TrendingUp,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Shield
 } from 'lucide-react';
+import api from '../services/api';
 
 const StatCard = ({ title, value, icon: Icon, trend, trendValue, color }) => (
   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
     <div className="flex items-center justify-between mb-4">
-      <div className={`p-3 rounded-xl ${color} bg-opacity-10 text-${color.split('-')[1]}-600`}>
+      <div className={`p-3 rounded-xl ${color} bg-opacity-10 text-slate-900`}>
         <Icon size={24} />
       </div>
       <div className={`flex items-center gap-1 text-sm font-medium ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -25,100 +27,130 @@ const StatCard = ({ title, value, icon: Icon, trend, trendValue, color }) => (
 );
 
 const Dashboard = () => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/admin/stats');
+      setStats(res.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-3">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-900"></div>
+        <p className="text-slate-500 font-medium">Crunching real-time data...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Dashboard Overview</h1>
-        <p className="text-slate-500 mt-1">Welcome back, here's what's happening today.</p>
+        <p className="text-slate-500 mt-1">Welcome back, here's what's happening today in your platform.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Users" 
-          value="2,543" 
+          value={stats?.totalUsers || 0} 
           icon={Users} 
           trend="up" 
-          trendValue="+12.5%" 
-          color="bg-blue-500"
+          trendValue={`+${stats?.growth || 0}%`} 
+          color="bg-slate-900"
         />
         <StatCard 
-          title="Active Now" 
-          value="156" 
+          title="Regular Users" 
+          value={stats?.userCount || 0} 
           icon={UserCheck} 
           trend="up" 
           trendValue="+5.2%" 
-          color="bg-emerald-500"
+          color="bg-slate-900"
         />
         <StatCard 
-          title="New Users" 
-          value="48" 
+          title="Admins" 
+          value={stats?.adminCount || 0} 
+          icon={Shield} 
+          trend="up" 
+          trendValue="+1" 
+          color="bg-slate-900"
+        />
+        <StatCard 
+          title="Signups (Today)" 
+          value={stats?.recentUsers?.length || 0} 
           icon={TrendingUp} 
           trend="up" 
           trendValue="+8.1%" 
-          color="bg-violet-500"
-        />
-        <StatCard 
-          title="Churn Rate" 
-          value="2.4%" 
-          icon={UserMinus} 
-          trend="down" 
-          trendValue="-1.2%" 
-          color="bg-amber-500"
+          color="bg-slate-900"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-slate-900">Recent Activity</h3>
-            <button className="text-primary-600 text-sm font-semibold hover:underline">View all</button>
+            <h3 className="text-lg font-bold text-slate-900">Recent Signups</h3>
+            <button className="text-slate-900 text-sm font-semibold hover:underline">View all</button>
           </div>
           <div className="space-y-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold">
-                  {String.fromCharCode(64 + i)}
+            {stats?.recentUsers?.map((u, i) => (
+              <div key={u._id} className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-900 font-bold">
+                  {u.name?.charAt(0) || 'U'}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-slate-900">User {i} signed up</p>
-                  <p className="text-xs text-slate-500 font-medium">2 hours ago</p>
+                  <p className="text-sm font-semibold text-slate-900">{u.name || 'Anonymous User'}</p>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {u.email} • {new Date(u.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider rounded-full">
-                  Success
+                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${
+                  u.role === 'admin' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
+                }`}>
+                  {u.role}
                 </span>
               </div>
             ))}
+            {(!stats?.recentUsers || stats.recentUsers.length === 0) && (
+              <p className="text-center py-4 text-slate-500">No recent signups yet.</p>
+            )}
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Platform Usage</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-6">User Distribution</h3>
           <div className="space-y-6">
             <div>
               <div className="flex justify-between text-sm font-medium mb-2">
-                <span className="text-slate-600">Mobile App</span>
-                <span className="text-slate-900">65%</span>
+                <span className="text-slate-600">Regular Users</span>
+                <span className="text-slate-900">
+                  {stats?.totalUsers ? Math.round((stats.userCount / stats.totalUsers) * 100) : 0}%
+                </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
-                <div className="bg-primary-600 h-2 rounded-full" style={{ width: '65%' }}></div>
+                <div className="bg-slate-900 h-2 rounded-full" style={{ width: `${stats?.totalUsers ? (stats.userCount / stats.totalUsers) * 100 : 0}%` }}></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm font-medium mb-2">
-                <span className="text-slate-600">Web Portal</span>
-                <span className="text-slate-900">25%</span>
+                <span className="text-slate-600">Admins</span>
+                <span className="text-slate-900">
+                  {stats?.totalUsers ? Math.round((stats.adminCount / stats.totalUsers) * 100) : 0}%
+                </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
-                <div className="bg-primary-400 h-2 rounded-full" style={{ width: '25%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm font-medium mb-2">
-                <span className="text-slate-600">API Access</span>
-                <span className="text-slate-900">10%</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-2">
-                <div className="bg-primary-200 h-2 rounded-full" style={{ width: '10%' }}></div>
+                <div className="bg-slate-400 h-2 rounded-full" style={{ width: `${stats?.totalUsers ? (stats.adminCount / stats.totalUsers) * 100 : 0}%` }}></div>
               </div>
             </div>
           </div>
