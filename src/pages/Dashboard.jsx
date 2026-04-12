@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  UserCheck, 
-  UserMinus, 
+import {
+  Users,
+  UserCheck,
+  UserMinus,
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
@@ -10,17 +10,8 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 
-const StatCard = ({ title, value, icon: Icon, trend, trendValue, color }) => (
+const StatCard = ({ title, value, trend, trendValue, color }) => (
   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-    <div className="flex items-center justify-between mb-4">
-      <div className={`p-3 rounded-xl ${color} bg-opacity-10 text-slate-900`}>
-        <Icon size={24} />
-      </div>
-      <div className={`flex items-center gap-1 text-sm font-medium ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
-        {trendValue}
-        {trend === 'up' ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-      </div>
-    </div>
     <h3 className="text-slate-500 text-sm font-medium mb-1">{title}</h3>
     <p className="text-2xl font-bold text-slate-900">{value}</p>
   </div>
@@ -63,38 +54,38 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="Total Users" 
-          value={stats?.totalUsers || 0} 
-          icon={Users} 
-          trend="up" 
-          trendValue={`+${stats?.growth || 0}%`} 
+        <StatCard
+          title="Total Users"
+          value={stats?.totalUsers || 0}
+          icon={Users}
+          trend="up"
+          trendValue={`+${stats?.growth || 0}%`}
           color="bg-slate-900"
         />
-        <StatCard 
-          title="Regular Users" 
-          value={stats?.userCount || 0} 
-          icon={UserCheck} 
-          trend="up" 
-          trendValue="+5.2%" 
+        <StatCard
+          title="Regular Users"
+          value={stats?.userCount || 0}
+          icon={UserCheck}
+          trend="up"
+          trendValue="+5.2%"
           color="bg-slate-900"
         />
-        <StatCard 
-          title="Admins" 
-          value={stats?.adminCount || 0} 
-          icon={Shield} 
-          trend="up" 
-          trendValue="+1" 
+        <StatCard
+          title="Admins"
+          value={stats?.adminCount || 0}
+          icon={Shield}
+          trend="up"
+          trendValue="+1"
           color="bg-slate-900"
         />
-        <StatCard 
-          title="Signups (Today)" 
-          value={stats?.recentUsers?.length || 0} 
-          icon={TrendingUp} 
-          trend="up" 
-          trendValue="+8.1%" 
+        {/* <StatCard
+          title="Signups (Today)"
+          value={stats?.recentUsers?.length || 0}
+          icon={TrendingUp}
+          trend="up"
+          trendValue="+8.1%"
           color="bg-slate-900"
-        />
+        /> */}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -115,9 +106,8 @@ const Dashboard = () => {
                     {u.email} • {new Date(u.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${
-                  u.role === 'admin' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
-                }`}>
+                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${u.role === 'admin' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
+                  }`}>
                   {u.role}
                 </span>
               </div>

@@ -56,16 +56,6 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="relative z-10 flex items-center gap-6 text-sm font-medium">
-            <div className="flex -space-x-3">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-primary-700 bg-primary-400 flex items-center justify-center">
-                  {String.fromCharCode(64 + i)}
-                </div>
-              ))}
-            </div>
-            <p className="text-primary-200">Joined by 10k+ developers</p>
-          </div>
         </div>
 
         {/* Right Side - Form */}
