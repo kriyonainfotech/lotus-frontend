@@ -35,7 +35,7 @@ const Users = () => {
       const res = await api.get('/admin/users');
       setUsers(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users:', error.response?.data || error.message);
       // Fallback dummy data for demo if backend fails or returns 401
       setUsers([
         { _id: '1', name: 'John Doe', email: 'john@example.com', phoneNumber: '1234567890' },
