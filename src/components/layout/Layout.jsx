@@ -9,7 +9,10 @@ import {
   Menu,
   X,
   UserCircle,
-  LayoutTemplate
+  LayoutTemplate,
+  Tags,
+  Calendar,
+  Settings2
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -42,8 +45,10 @@ const Layout = ({ children }) => {
   const navItems = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/templates", icon: LayoutTemplate, label: "Templates" },
+    { to: "/categories", icon: Tags, label: "Categories" },
+    { to: "/schedule", icon: Calendar, label: "Schedule Manager" },
     { to: "/users", icon: Users, label: "Manage Users" },
-    // { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: "/settings", icon: Settings2, label: "App Settings" },
   ];
 
   return (

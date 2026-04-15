@@ -12,6 +12,9 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Templates from "./pages/Templates";
 import TemplateEditor from "./pages/TemplateEditor";
+import Categories from "./pages/Categories";
+import ScheduleManager from "./pages/ScheduleManager";
+import AppSettings from "./pages/AppSettings";
 
 // Simple Settings mockup
 const Settings = () => (
@@ -105,10 +108,26 @@ function App() {
               }
             />
             <Route
+              path="/categories"
+              element={
+                <Layout>
+                  <Categories />
+                </Layout>
+              }
+            />
+            <Route
+              path="/schedule"
+              element={
+                <Layout>
+                  <ScheduleManager />
+                </Layout>
+              }
+            />
+            <Route
               path="/settings"
               element={
                 <Layout>
-                  <Settings />
+                  <AppSettings />
                 </Layout>
               }
             />
