@@ -1,17 +1,7 @@
 import axios from 'axios';
 
-const getBaseUrl = () => {
-  const hostname = window.location.hostname;
-  // If we are on localhost, use localhost
-  if (hostname === 'localhost') return 'http://localhost:3333/api';
-  
-  // If we are on a LAN IP (e.g. 192.168.x.x), use that IP for the backend too
-  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) return `http://${hostname}:3333/api`;
-  // Default to production
-  return 'https://lotus-backend-nine.vercel.app/api';
-};
-
-const API_BASE_URL = getBaseUrl();
+const API_BASE_URL = 'https://lotus-backend-nine.vercel.app/api';
+// const API_BASE_URL = 'http://localhost:3333/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
