@@ -12,7 +12,8 @@ import {
   LayoutTemplate,
   Tags,
   Calendar,
-  Settings2
+  Settings2,
+  Bell
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -46,6 +47,7 @@ const Layout = ({ children }) => {
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/templates", icon: LayoutTemplate, label: "Templates" },
     { to: "/categories", icon: Tags, label: "Categories" },
+    { to: "/notifications", icon: Bell, label: "Notifications" },
     { to: "/schedule", icon: Calendar, label: "Schedule Manager" },
     { to: "/users", icon: Users, label: "Manage Users" },
     { to: "/settings", icon: Settings2, label: "App Settings" },

@@ -65,6 +65,7 @@ const TemplateEditor = () => {
   const [categoryId, setCategoryId] = useState('');
   const [isHeroSection, setIsHeroSection] = useState(false);
   const [scheduledDate, setScheduledDate] = useState('');
+  const [templateType, setTemplateType] = useState('CONTENT');
   const [categories, setCategories] = useState([]);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
@@ -110,7 +111,7 @@ const TemplateEditor = () => {
   // --- CORE WORKFLOW & DESIGN TOOLS (Declared early for useEffect dependencies) ---
   const saveHistory = useCallback((canvasInstance = canvas) => {
     if (!canvasInstance || isInternalChange.current) return;
-    const json = JSON.stringify(canvasInstance.toJSON());
+    const json = JSON.stringify(canvasInstance.toJSON(['id', 'role']));
 
     // Only push if different from last state to avoid duplicates
     const lastState = undoStack.current[undoStack.current.length - 1];
@@ -594,6 +595,7 @@ const TemplateEditor = () => {
       if (template.scheduledDate) {
         setScheduledDate(new Date(template.scheduledDate).toISOString().split('T')[0]);
       }
+      setTemplateType(template.type || 'CONTENT');
 
       if (template.fabricJSON) {
         // Prevent loading into a disposed canvas (React Strict Mode double mount issue)
@@ -802,7 +804,8 @@ const TemplateEditor = () => {
           x, y, width, height,
           angle: originalAngle, opacity, zIndex,
           fit: 'contain',
-          isBackground: isForcedBackground
+          isBackground: isForcedBackground,
+          role: obj.role || 'none'
         });
       } else if (obj.type.includes('text')) {
         textLayers.push({
@@ -821,7 +824,8 @@ const TemplateEditor = () => {
           lineHeight: obj.lineHeight || 1.16,
           uppercase: obj.uppercase || false,
           strokeColor: obj.stroke || '#000000',
-          strokeWidth: obj.strokeWidth || 0
+           strokeWidth: obj.strokeWidth || 0,
+          role: obj.role || 'none'
         });
       }
     });
@@ -830,14 +834,15 @@ const TemplateEditor = () => {
       name: templateName,
       category: category,
       categoryId: categoryId || null,
-      isHeroSection: isHeroSection,
+       isHeroSection: isHeroSection,
+      type: templateType,
       scheduledDate: scheduledDate || null,
       baseColor: canvas.backgroundColor,
       ratio: currentConfig.ratio,
       size: canvasType.toUpperCase(),
       images,
       textLayers,
-      fabricJSON: canvas.toJSON()
+      fabricJSON: canvas.toJSON(['id', 'role'])
     };
   };
 
@@ -998,7 +1003,7 @@ const TemplateEditor = () => {
                       <p className="text-[9px] text-slate-400 ml-1">Optional: Set a date to show in the mobile calendar.</p>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 mt-2">
+                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 mt-2">
                       <div className="flex flex-col">
                         <span className="text-xs font-black text-slate-900">Hero Section</span>
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Show in top list</span>
@@ -1009,6 +1014,21 @@ const TemplateEditor = () => {
                       >
                         <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isHeroSection ? 'left-7' : 'left-1'}`} />
                       </button>
+                    </div>
+
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 mt-2">
+                      <div className="flex flex-col mb-2">
+                        <span className="text-xs font-black text-slate-900">Template Type</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Content or Brand Kit Frame</span>
+                      </div>
+                      <select
+                        value={templateType}
+                        onChange={(e) => setTemplateType(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:ring-2 ring-slate-900/5 transition-all"
+                      >
+                        <option value="CONTENT">CONTENT TEMPLATE</option>
+                        <option value="BRAND_KIT">BRAND KIT FRAME</option>
+                      </select>
                     </div>
                   </div>
                 </section>
@@ -1312,6 +1332,29 @@ const TemplateEditor = () => {
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full p-0"
                   />
                 </div>
+              </div>
+
+              <div className="w-px h-6 bg-white/10 mx-1" />
+              
+              {/* Layer Role Selector */}
+              <div className="flex items-center bg-white/10 rounded-xl px-2 h-[34px]" title="Layer Role (for Brand Kits)">
+                <select
+                  className="bg-transparent text-white text-[10px] font-bold outline-none cursor-pointer w-20 uppercase"
+                  value={activeObject.role || 'none'}
+                  onChange={(e) => {
+                    activeObject.set('role', e.target.value);
+                    canvas.renderAll();
+                    setIsDirty(true);
+                    setRenderTick(t => t + 1);
+                  }}
+                >
+                  <option value="none" className="text-black">None</option>
+                  <option value="brandName" className="text-black">Name</option>
+                  <option value="brandPhone" className="text-black">Phone</option>
+                  <option value="brandLogo" className="text-black">Logo</option>
+                  <option value="brandAddress" className="text-black">Address</option>
+                  <option value="brandEmail" className="text-black">Email</option>
+                </select>
               </div>
 
               <div className="w-px h-6 bg-white/10 mx-1" />

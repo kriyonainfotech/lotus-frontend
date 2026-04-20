@@ -108,8 +108,13 @@ const Templates = () => {
           {templates.map((template) => (
             <div
               key={template._id}
-              className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-slate-200 transition-all duration-300 flex flex-col"
+              className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-slate-200 transition-all duration-300 flex flex-col relative"
             >
+              {template.type === 'BRAND_KIT' && (
+                <div className="absolute top-4 left-4 z-10 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg shadow-lg">
+                  Brand Kit
+                </div>
+              )}
               <div className="relative aspect-[4/5] bg-slate-50 overflow-hidden cursor-pointer" onClick={() => navigate(`/templates/edit/${template._id}`)}>
                 {template.imageUrl ? (
                   <img 

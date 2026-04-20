@@ -119,7 +119,7 @@ export function initAligningGuidelines(canvas) {
 
   canvas.on('before:render', () => {
     // Clear lines before next render pass if mouse is up
-    if (verticalLines.length === 0 && horizontalLines.length === 0) {
+    if (verticalLines.length === 0 && horizontalLines.length === 0 && canvas.contextTop) {
       canvas.clearContext(canvas.contextTop);
     }
   });
@@ -151,6 +151,7 @@ export function initAligningGuidelines(canvas) {
   });
 
   function drawLine(ctx, x1, y1, x2, y2) {
+    if (!ctx) return;
     ctx.save();
     ctx.lineWidth = aligningLineWidth;
     ctx.strokeStyle = aligningLineColor;

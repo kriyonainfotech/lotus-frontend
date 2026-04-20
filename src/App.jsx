@@ -15,6 +15,7 @@ import TemplateEditor from "./pages/TemplateEditor";
 import Categories from "./pages/Categories";
 import ScheduleManager from "./pages/ScheduleManager";
 import AppSettings from "./pages/AppSettings";
+import Notifications from "./pages/Notifications";
 
 // Simple Settings mockup
 const Settings = () => (
@@ -120,6 +121,14 @@ function App() {
               element={
                 <Layout>
                   <ScheduleManager />
+                </Layout>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <Layout>
+                  <Notifications />
                 </Layout>
               }
             />

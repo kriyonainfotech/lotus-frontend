@@ -13,7 +13,16 @@ const AppSettings = () => {
     faq: [],
     customerCareEmail: '',
     inviteMessage: '',
-    storeLink: ''
+    storeLink: '',
+    // SMTP
+    smtpHost: '',
+    smtpPort: 587,
+    smtpUser: '',
+    smtpPass: '',
+    smtpFromEmail: '',
+    // Templates
+    welcomeEmailTemplate: { subject: '', body: '' },
+    purchaseEmailTemplate: { subject: '', body: '' }
   });
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -31,7 +40,13 @@ const AppSettings = () => {
     try {
       setLoading(true);
       const res = await api.get('/settings');
-      setSettings(res.data);
+      // Merge with default values to avoid errors if some fields are missing
+      setSettings(prev => ({
+        ...prev,
+        ...res.data,
+        welcomeEmailTemplate: res.data.welcomeEmailTemplate || { subject: '', body: '' },
+        purchaseEmailTemplate: res.data.purchaseEmailTemplate || { subject: '', body: '' }
+      }));
     } catch (err) {
       console.error('Error fetching settings:', err);
     } finally {
@@ -128,6 +143,7 @@ const AppSettings = () => {
         <TabButton id="legal" label="Legal & About" icon={Shield} />
         <TabButton id="faq" label="FAQ Manager" icon={HelpCircle} />
         <TabButton id="support" label="Support & Social" icon={Mail} />
+        <TabButton id="email" label="Email Config" icon={Mail} />
       </div>
 
       <div className="grid grid-cols-1 gap-8">
@@ -376,6 +392,156 @@ const AppSettings = () => {
                       />
                     </div>
                     <p className="text-[10px] text-slate-400 px-2 mt-1">This text is copied to the user's clipboard or shared directly when they use the "Invite Friends" feature.</p>
+                  </div>
+               </div>
+            </section>
+          </div>
+        )}
+
+        {/* EMAIL TAB */}
+        {activeTab === 'email' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            {/* SMTP Settings */}
+            <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+               <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-900 border border-slate-100">
+                     <Settings2 size={20} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">SMTP Configuration</h3>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">SMTP Host</label>
+                    <input 
+                      type="text" 
+                      value={settings.smtpHost}
+                      onChange={(e) => setSettings({ ...settings, smtpHost: e.target.value })}
+                      placeholder="smtp.gmail.com"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">SMTP Port</label>
+                    <input 
+                      type="number" 
+                      value={settings.smtpPort}
+                      onChange={(e) => setSettings({ ...settings, smtpPort: parseInt(e.target.value) })}
+                      placeholder="587"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">SMTP User</label>
+                    <input 
+                      type="text" 
+                      value={settings.smtpUser}
+                      onChange={(e) => setSettings({ ...settings, smtpUser: e.target.value })}
+                      placeholder="your-email@gmail.com"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">SMTP Password</label>
+                    <input 
+                      type="password" 
+                      value={settings.smtpPass}
+                      onChange={(e) => setSettings({ ...settings, smtpPass: e.target.value })}
+                      placeholder="Your App Password"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">From Email (Display Name)</label>
+                    <input 
+                      type="text" 
+                      value={settings.smtpFromEmail}
+                      onChange={(e) => setSettings({ ...settings, smtpFromEmail: e.target.value })}
+                      placeholder="Lotus <support@lotus.digital>"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+               </div>
+            </section>
+
+            {/* Welcome Email Template */}
+            <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+               <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-900 border border-slate-100">
+                     <Mail size={20} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">Welcome Email Template</h3>
+               </div>
+
+               <div className="space-y-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject Line</label>
+                    <input 
+                      type="text" 
+                      value={settings.welcomeEmailTemplate.subject}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        welcomeEmailTemplate: { ...settings.welcomeEmailTemplate, subject: e.target.value } 
+                      })}
+                      placeholder="Welcome to Lotus!"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Body</label>
+                      <span className="text-[10px] text-slate-400 font-bold">Use {"{{name}}"} for user name</span>
+                    </div>
+                    <textarea 
+                      value={settings.welcomeEmailTemplate.body}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        welcomeEmailTemplate: { ...settings.welcomeEmailTemplate, body: e.target.value } 
+                      })}
+                      placeholder="Hi {{name}}, Welcome to Lotus..."
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-semibold text-slate-700 focus:ring-4 focus:ring-slate-100 transition-all outline-none min-h-[150px]"
+                    />
+                  </div>
+               </div>
+            </section>
+
+            {/* Purchase Email Template */}
+            <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+               <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-900 border border-slate-100">
+                     <Mail size={20} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">Purchase Activation Template</h3>
+               </div>
+
+               <div className="space-y-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject Line</label>
+                    <input 
+                      type="text" 
+                      value={settings.purchaseEmailTemplate.subject}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        purchaseEmailTemplate: { ...settings.purchaseEmailTemplate, subject: e.target.value } 
+                      })}
+                      placeholder="Plan Activated - Lotus Pro"
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-900 focus:ring-4 focus:ring-slate-100 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Body</label>
+                      <span className="text-[10px] text-slate-400 font-bold">Use {"{{name}}"} and {"{{planName}}"}</span>
+                    </div>
+                    <textarea 
+                      value={settings.purchaseEmailTemplate.body}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        purchaseEmailTemplate: { ...settings.purchaseEmailTemplate, body: e.target.value } 
+                      })}
+                      placeholder="Hi {{name}}, Your {{planName}} is active..."
+                      className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-semibold text-slate-700 focus:ring-4 focus:ring-slate-100 transition-all outline-none min-h-[150px]"
+                    />
                   </div>
                </div>
             </section>
