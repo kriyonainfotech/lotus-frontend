@@ -21,9 +21,65 @@ import {
   Upload,
   Image as ImageIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CreditCard,
+  IndianRupee
 } from 'lucide-react';
 import api from '../services/api';
+
+const formatDate = (value) => {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const SubscriptionBadge = ({ user }) => {
+  const active = user.activeSubscription;
+  const last = user.lastSubscription;
+
+  if (active) {
+    const expired = new Date(active.endDate) < new Date();
+    if (!expired) {
+      return (
+        <div className="space-y-1">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-green-100 text-green-800">
+            Pro Active
+          </span>
+          <p className="text-sm font-bold text-slate-900">{active.planName}</p>
+          <p className="text-[10px] text-slate-500">
+            ₹{active.price} · expires {formatDate(active.endDate)}
+          </p>
+        </div>
+      );
+    }
+  }
+
+  if (last) {
+    const wasActive = last.status === 'active' && new Date(last.endDate) >= new Date();
+    return (
+      <div className="space-y-1">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+          wasActive ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'
+        }`}>
+          {wasActive ? 'Pro Active' : last.status === 'expired' ? 'Expired' : last.status}
+        </span>
+        <p className="text-sm font-semibold text-slate-700">{last.planName}</p>
+        <p className="text-[10px] text-slate-400">
+          ₹{last.price} · {formatDate(last.endDate)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <span className="text-xs font-semibold text-slate-400">No purchase yet</span>
+  );
+};
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -297,6 +353,7 @@ const Users = () => {
               <tr>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">User</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Business</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Plan / Purchase</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -304,7 +361,7 @@ const Users = () => {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-10 text-center">
+                  <td colSpan="5" className="px-6 py-10 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
                       <p className="text-slate-500 text-sm">Loading users...</p>
@@ -313,7 +370,7 @@ const Users = () => {
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-10 text-center text-slate-500">
+                  <td colSpan="5" className="px-6 py-10 text-center text-slate-500">
                     No users found matching your search.
                   </td>
                 </tr>
@@ -351,6 +408,9 @@ const Users = () => {
                           </p>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 min-w-[160px]">
+                      <SubscriptionBadge user={user} />
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
@@ -816,6 +876,41 @@ const Users = () => {
                     </div>
                   </div>
                 </div>
+              </section>
+
+              <section className="rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-white p-6">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                  <CreditCard size={14} /> Subscription & Purchase
+                </h4>
+                {viewUser.activeSubscription ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-white rounded-xl border border-emerald-100">
+                      <p className="text-[10px] font-black text-emerald-600 uppercase">Current plan</p>
+                      <p className="text-lg font-bold text-slate-900 mt-1">{viewUser.activeSubscription.planName}</p>
+                      <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
+                        <IndianRupee size={14} />
+                        {viewUser.activeSubscription.price} · {viewUser.activeSubscription.durationDays} days
+                      </p>
+                    </div>
+                    <div className="p-4 bg-white rounded-xl border border-slate-100 space-y-2 text-sm">
+                      <p><span className="text-slate-400 font-semibold">Status:</span> <span className="font-bold text-green-700">Active</span></p>
+                      <p><span className="text-slate-400 font-semibold">Expires:</span> {formatDate(viewUser.activeSubscription.endDate)}</p>
+                      <p><span className="text-slate-400 font-semibold">Started:</span> {formatDate(viewUser.activeSubscription.startDate)}</p>
+                      <p className="text-xs text-slate-500 break-all"><span className="font-semibold">Payment ID:</span> {viewUser.activeSubscription.paymentId || '—'}</p>
+                    </div>
+                  </div>
+                ) : viewUser.lastSubscription ? (
+                  <div className="p-4 bg-white rounded-xl border border-slate-100 space-y-2 text-sm">
+                    <p className="font-bold text-slate-800">{viewUser.lastSubscription.planName}</p>
+                    <p><span className="text-slate-400 font-semibold">Status:</span> {viewUser.lastSubscription.status}</p>
+                    <p><span className="text-slate-400 font-semibold">Amount:</span> ₹{viewUser.lastSubscription.price}</p>
+                    <p><span className="text-slate-400 font-semibold">Purchased:</span> {formatDate(viewUser.lastSubscription.createdAt)}</p>
+                    <p><span className="text-slate-400 font-semibold">Expired:</span> {formatDate(viewUser.lastSubscription.endDate)}</p>
+                    <p className="text-xs text-slate-500 break-all"><span className="font-semibold">Payment ID:</span> {viewUser.lastSubscription.paymentId || '—'}</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">This user has not purchased any plan yet.</p>
+                )}
               </section>
 
               {viewUser.business && (

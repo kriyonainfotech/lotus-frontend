@@ -13,7 +13,8 @@ import {
   Tags,
   Calendar,
   Settings2,
-  Bell
+  Bell,
+  CreditCard
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -50,6 +51,7 @@ const Layout = ({ children }) => {
     { to: "/notifications", icon: Bell, label: "Notifications" },
     { to: "/schedule", icon: Calendar, label: "Schedule Manager" },
     { to: "/users", icon: Users, label: "Manage Users" },
+    { to: "/pricing-plans", icon: CreditCard, label: "Pricing Plans" },
     { to: "/settings", icon: Settings2, label: "App Settings" },
   ];
 

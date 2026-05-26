@@ -16,6 +16,7 @@ import Categories from "./pages/Categories";
 import ScheduleManager from "./pages/ScheduleManager";
 import AppSettings from "./pages/AppSettings";
 import Notifications from "./pages/Notifications";
+import PricingPlans from "./pages/PricingPlans";
 
 // Simple Settings mockup
 const Settings = () => (
@@ -105,6 +106,14 @@ function App() {
               element={
                 <Layout>
                   <Users />
+                </Layout>
+              }
+            />
+            <Route
+              path="/pricing-plans"
+              element={
+                <Layout>
+                  <PricingPlans />
                 </Layout>
               }
             />

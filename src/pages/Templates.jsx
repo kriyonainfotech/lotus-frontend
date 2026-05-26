@@ -20,7 +20,7 @@ const Templates = () => {
   const fetchTemplates = async () => {
     try {
       const response = await api.get('/templates');
-      setTemplates(response.data);
+      setTemplates(response.data.templates || response.data);
     } catch (error) {
       console.error('Error fetching templates:', error);
     } finally {
