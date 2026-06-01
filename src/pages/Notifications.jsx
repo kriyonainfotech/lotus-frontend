@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Bell, Send, Image as ImageIcon, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import api from '../services/api';
 
 const Notifications = () => {
   const [loading, setLoading] = useState(false);
@@ -24,14 +24,7 @@ const Notifications = () => {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3333/api'}/notifications/send`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.post('/notifications/send', formData);
 
       if (response.data.success) {
         setSuccess(response.data.message);
